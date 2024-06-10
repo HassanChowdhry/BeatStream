@@ -27,11 +27,6 @@ var colors = [
 ];
 
 var step = 0;
-// color table indices for:
-// current color left
-// next color left
-// current color right
-// next color right
 var colorIndices = [0, 1, 2, 3];
 
 // transition speed
