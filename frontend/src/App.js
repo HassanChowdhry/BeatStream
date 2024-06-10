@@ -5,6 +5,7 @@ import CreateRoom from './Components/CreateRoom'
 import Room from './Components/Room'
 import './App.css';
 
+//TODO: using session keys in backend, udpate to frontend
 function App() {
   return (
     <div id='gradient'>

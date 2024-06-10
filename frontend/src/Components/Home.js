@@ -9,7 +9,8 @@ function Home() {
 
   useEffect(() => {
     const fetchRoomCode = async () => {
-      const response = await fetch('/api/user-in-room');
+      const SERVER = "http://127.0.0.1:8000"
+      const response = await fetch(`${SERVER}/api/user-in-room`);
       const data = await response.json();
       setRoomCode(data.code);
     };
@@ -26,7 +27,7 @@ function Home() {
     <Grid container spacing={3}>
     <Grid item xs={12} align="center">
       <Typography variant="h3" compact="h3">
-        House Party
+        Beatstream
       </Typography>
     </Grid>
     <Grid item xs={12} align="center">
