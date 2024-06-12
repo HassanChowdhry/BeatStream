@@ -20,7 +20,7 @@ const Room = (props) => {
       .then((response) => response.json())
       .then((data) => {
         roomDetails.spotify_auth = true;
-        if (data.status) {
+        if (!data.status) {
           fetch('/spotify/get-auth-url')
             .then((response) => response.json())
             .then((data) => {
@@ -38,26 +38,31 @@ const Room = (props) => {
       if (!response.ok) {
         // props.leaveRoomCallback();
         navigate('/');
-      } else {
-        const data = await response.json();
-        setRoomDetails({
-          ...roomDetails,
-          votesToSkip: data.votes_to_skip,
-          guestCanPause: data.guest_can_pause,
-          isHost: data.is_host,
-        });
+        } else {
+          const data = await response.json();
+          setRoomDetails({
+            ...roomDetails,
+            votesToSkip: data.votes_to_skip,
+            guestCanPause: data.guest_can_pause,
+            isHost: data.is_host,
+          });
+          console.log("New Before " + data.is_host.toString())
+          if (data.is_host.toString()) {
+            console.log("Auth Spotify")
+            authSpotify();
+          }
+          console.log("New After " + data.is_host.toString())
+          
       }
     } catch (error) {
       console.error(error);
     }
-    if (roomDetails.isHost) {
-      console.log("Auth Spotify")
-      authSpotify();
-    }
+
   }, [navigate, roomCode, roomDetails, authSpotify]);
 
   useEffect(() => {
     getRoomDetails();
+    console.log("in use effect " + roomDetails.isHost.toString())
   }, []);
 
 

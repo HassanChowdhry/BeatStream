@@ -4,14 +4,15 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from requests import Request, post
-from .util import update_or_create_user_token, is_authenticated
+from .util import update_or_create_user_token, is_authenticated, exe_api_request
+from api.models import Room
 
 # Create your views here.
 class AuthURL(APIView):
   def get(self, request, format=None):
     scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing'
     
-    url = Request('GET', 'https//accounts.spotify.com/authorize', params={
+    url = Request('GET', 'https://accounts.spotify.com/authorize', params={
       'scope': scopes,
       'response_type': 'code',
       'redirect_uri': REDIRECT_URL,
@@ -25,25 +26,26 @@ def spotify_callback(request, format=None):
   code = request.GET.get('code')
   error = request.GET.get('error')
 
-  response = post('httos://accounts.spotify.com/api/token', data={
-    'grant_type': 'authorization_code',
-    'code': code,
-    'redirect_url': REDIRECT_URL,
-    'client_id': CLIENT_ID,
-    'client_secret': CLIENT_SECRET,
+  response = post('https://accounts.spotify.com/api/token', data={
+      'grant_type': 'authorization_code',
+      'code': code,
+      'redirect_uri': REDIRECT_URL,
+      'client_id': CLIENT_ID,
+      'client_secret': CLIENT_SECRET
   }).json()
-  
+
   access_token = response.get('access_token')
   token_type = response.get('token_type')
   refresh_token = response.get('refresh_token')
   expires_in = response.get('expires_in')
   error = response.get('error')
-  
+
   if not request.session.exists(request.session.session_key):
-    request.session.create()
-  
-  update_or_create_user_token(request.session.session_key, access_token, token_type, expires_in, refresh_token)
-  
+      request.session.create()
+
+  update_or_create_user_token(
+      request.session.session_key, access_token, token_type, expires_in, refresh_token)
+
   return redirect('frontend:')
 
 
@@ -51,3 +53,45 @@ class IsAuthenticated(APIView):
   def get(self, request, format=None):
     is_auth = is_authenticated(self.request.session.session_key)
     return Response({'status': is_auth}, status=status.HTTP_200_OK)
+
+class CurrentSong(APIView):
+  def get(self, request, format=None):
+    room_code = self.request.session.get('room_code')
+    room = Room.objects.filter(code=room_code)
+    if room.exists():
+      room = room[0]
+    else:
+      return Response({"Error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+    host = room.host
+    endpoint = "player/currently-playing"
+    response = exe_api_request(host, endpoint)
+
+    if 'error' in response or 'item' not in response:
+      return Response({"Error": "item not found"}, status=status.HTTP_204_NO_CONTENT)
+
+    item = response.get('item')
+    duration = item.get('duration_ms')
+    progress = response.get('progress_ms')
+    album_cover = item.get('album').get('images')[0].get('url')
+    is_playing = response.get('is_playing')
+    song_id = item.get('id')
+    
+    artist_string = ""
+    for i, art in enumerate(item.get('artist')):
+      if i > 0:
+        artist_string += ", "
+      name = art.get('name')
+      artist_string += name
+    
+    song = {
+      'title': item.get('name'),
+      'artist': artist_string,
+      'duration': duration,
+      'time': progress,
+      'image_url': album_cover,
+      'is_playing': is_playing,
+      'votes': 0,
+      'id': song_id
+    }
+    
+    return Response(song, status=status.HTTP_200_OK)
