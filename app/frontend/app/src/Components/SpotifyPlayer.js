@@ -57,9 +57,11 @@ const SpotifyPlayer = (props) => {
           <Typography component="h4" variant="h4">
             {props.title}
           </Typography>
+          
           <Typography component="h6" variant="h6">
             {props.artist}
           </Typography>
+          
           <div>
             <IconButton style={{color: "#fff"}} onClick={() => prev_song()}>
               <SkipPreviousIcon  />
@@ -71,7 +73,10 @@ const SpotifyPlayer = (props) => {
               <SkipNextIcon  /> 
             </IconButton>
           </div>
-          {`${props.votes} /  ${props.votes_required}`}
+          
+          <Typography component="h6" variant="h6">
+            {`${props.votes} /  ${props.votes_required}`}
+          </Typography>
         </Grid>
       </Grid>
       <LinearProgress variant="determinate" value={songProgress} />

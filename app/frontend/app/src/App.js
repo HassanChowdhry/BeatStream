@@ -3,6 +3,7 @@ import Home from './Components/Home';
 import RoomJoin from './Components/RoomJoin'
 import CreateRoom from './Components/CreateRoom'
 import Room from './Components/Room'
+import AboutUs from './Components/AboutUs';
 import './App.css';
 
 //TODO: using session keys in backend, udpate to frontend
@@ -16,6 +17,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/join" element={<RoomJoin />} />
         <Route path="/create" element={<CreateRoom />} />
+        <Route path="/aboutus" element={<AboutUs />} />
         <Route path="/room/:roomCode" element={<Room />} />
       </Routes>
     </div>

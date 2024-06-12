@@ -34,6 +34,9 @@ function Home() {
         <Button color="primary" to="/join" component={Link}>
           Join a Room
         </Button>
+        <Button color='info' to="/aboutus" component={Link}>
+          About Us
+        </Button>
         <Button color="secondary" to="/create" component={Link}>
           Create a Room
         </Button>
