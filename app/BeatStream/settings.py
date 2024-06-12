@@ -40,11 +40,10 @@ INSTALLED_APPS = [
     "api.apps.ApiConfig",
     "rest_framework",
     'corsheaders',
-
+    'frontend',
+    'spotify.apps.SpotifyConfig'
 ]
 
-# White listing the localhost:3000 port
-# for React
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',
 )
@@ -126,7 +125,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "static/"
+REACT_APP_BUILD_PATH = "frontend/app/build"
+
+STATIC_URL = 'django_static/'
+# STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

@@ -9,8 +9,8 @@ function Home() {
 
   useEffect(() => {
     const fetchRoomCode = async () => {
-      const SERVER = "http://127.0.0.1:8000"
-      const response = await fetch(`${SERVER}/api/user-in-room`);
+      // const SERVER = "http://127.0.0.1:8000"
+      const response = await fetch(`/api/user-in-room`);
       const data = await response.json();
       setRoomCode(data.code);
     };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Grid, Button, Typography } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import CreateRoom from './CreateRoom';
@@ -9,18 +9,32 @@ const Room = (props) => {
     guestCanPause: false,
     isHost: false,
     showSettings: false,
+    spotify_auth: false
   });
   const { roomCode } = useParams();
   const navigate = useNavigate();
-  const SERVER = "http://127.0.0.1:8000"
+  // const SERVER = "http://127.0.0.1:8000"
 
-  useEffect(() => {
-    getRoomDetails();
-  });
+  const authSpotify = useCallback(async() => {
+    fetch('/spotify/is-auth')
+      .then((response) => response.json())
+      .then((data) => {
+        roomDetails.spotify_auth = true;
+        if (data.status) {
+          fetch('/spotify/get-auth-url')
+            .then((response) => response.json())
+            .then((data) => {
+              window.location.replace(data.url)
+            })
+            .catch((err) => console.error("Inner" + err))
+        }
+      })
+      .catch((err) => console.error("Outer" + err));
+  }, [roomDetails])
 
-  const getRoomDetails = async () => {
+  const getRoomDetails = useCallback(async () => {
     try {
-      const response = await fetch(`${SERVER}/api/get-room?code=${roomCode}`);
+      const response = await fetch(`/api/get-room?code=${roomCode}`);
       if (!response.ok) {
         // props.leaveRoomCallback();
         navigate('/');
@@ -36,7 +50,16 @@ const Room = (props) => {
     } catch (error) {
       console.error(error);
     }
-  };
+    if (roomDetails.isHost) {
+      console.log("Auth Spotify")
+      authSpotify();
+    }
+  }, [navigate, roomCode, roomDetails, authSpotify]);
+
+  useEffect(() => {
+    getRoomDetails();
+  }, []);
+
 
   const leaveButtonPressed = async () => {
     try {
@@ -44,7 +67,7 @@ const Room = (props) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       };
-      await fetch(`${SERVER}/api/leave-room`, requestOptions);
+      await fetch(`/api/leave-room`, requestOptions);
       // props.leaveRoomCallback();
       navigate('/');
     } catch (error) {

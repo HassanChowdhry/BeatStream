@@ -8,7 +8,7 @@ const CreateRoom = ({ votesToSkip = 2, guestCanPause = true, update = false, roo
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const navigate = useNavigate();
-  const SERVER = "http://127.0.0.1:8000"
+  // const SERVER = "http://127.0.0.1:8000"
 
   const handleVotesChange = (e) => {
     setVotesToSkipState(e.target.value);
@@ -27,7 +27,7 @@ const CreateRoom = ({ votesToSkip = 2, guestCanPause = true, update = false, roo
         guest_can_pause: guestCanPauseState,
       }),
     };
-    fetch(`${SERVER}/api/create-room`, requestOptions)
+    fetch(`/api/create-room`, requestOptions)
       .then((response) => response.json())
       .then((data) => navigate("/room/" + data.code));
   };
@@ -42,7 +42,7 @@ const CreateRoom = ({ votesToSkip = 2, guestCanPause = true, update = false, roo
         code: roomCode,
       }),
     };
-    fetch(`${SERVER}/api/update-room`, requestOptions).then((response) => {
+    fetch(`/api/update-room`, requestOptions).then((response) => {
       if (response.ok) {
         setSuccessMsg("Room updated successfully!");
       } else {

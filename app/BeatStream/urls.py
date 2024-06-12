@@ -15,10 +15,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+from django.conf import settings
+from frontend.views import serve_react
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include('api.urls')),
-    path("spotify/", include('spotify.urls'))
+    path("spotify/", include('spotify.urls')),
+    re_path(r"^(?P<path>.*)$", serve_react, {"document_root": settings.REACT_APP_BUILD_PATH}, name='frontend'),
 ]
