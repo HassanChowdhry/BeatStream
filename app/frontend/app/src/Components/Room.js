@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Grid, Button, Typography } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import CreateRoom from './CreateRoom';
+import SpotifyPlayer from './SpotifyPlayer';
 
 const Room = (props) => {
   const [roomDetails, setRoomDetails] = useState({
@@ -9,12 +10,30 @@ const Room = (props) => {
     guestCanPause: false,
     isHost: false,
     showSettings: false,
-    spotify_auth: false
+    spotify_auth: false,
   });
+
+  const [song, setSong] = useState({});
+
   const { roomCode } = useParams();
   const navigate = useNavigate();
-  // const SERVER = "http://127.0.0.1:8000"
-
+  
+  const getCurrentSong = () => {
+    fetch("/spotify/current-song")
+      .then((response) => {
+        if (!response.ok) {
+          return {};
+        } else {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        setSong(data);
+        console.log(data);
+      });
+  }
+  
+  
   const authSpotify = useCallback(async() => {
     fetch('/spotify/is-auth')
       .then((response) => response.json())
@@ -46,12 +65,10 @@ const Room = (props) => {
             guestCanPause: data.guest_can_pause,
             isHost: data.is_host,
           });
-          console.log("New Before " + data.is_host.toString())
           if (data.is_host.toString()) {
             console.log("Auth Spotify")
             authSpotify();
           }
-          console.log("New After " + data.is_host.toString())
           
       }
     } catch (error) {
@@ -62,7 +79,12 @@ const Room = (props) => {
 
   useEffect(() => {
     getRoomDetails();
-    console.log("in use effect " + roomDetails.isHost.toString())
+  }, []);
+
+  useEffect(() => {
+    getCurrentSong();
+    const interval = setInterval(getCurrentSong, 1000);
+    return () => clearInterval(interval);
   }, []);
 
 
@@ -120,7 +142,7 @@ const Room = (props) => {
   );
 
   return (
-    <Grid container spacing={1}>
+    <Grid container spacing={2}>
       {roomDetails.showSettings ? (
         renderSettings()
       ) : (
@@ -130,20 +152,8 @@ const Room = (props) => {
               Code: {roomCode}
             </Typography>
           </Grid>
-          <Grid item xs={12} align="center">
-            <Typography variant="h6" component="h6">
-              Votes: {roomDetails.votesToSkip}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} align="center">
-            <Typography variant="h6" component="h6">
-              Guest Can Pause: {roomDetails.guestCanPause.toString()}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} align="center">
-            <Typography variant="h6" component="h6">
-              Host: {roomDetails.isHost.toString()}
-            </Typography>
+          <Grid xs={12} item align="center">
+            <SpotifyPlayer {...song} />
           </Grid>
           {roomDetails.isHost && renderSettingsButton()}
           <Grid item xs={12} align="center">

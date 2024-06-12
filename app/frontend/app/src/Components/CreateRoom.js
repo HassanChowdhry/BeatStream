@@ -8,7 +8,6 @@ const CreateRoom = ({ votesToSkip = 2, guestCanPause = true, update = false, roo
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const navigate = useNavigate();
-  // const SERVER = "http://127.0.0.1:8000"
 
   const handleVotesChange = (e) => {
     setVotesToSkipState(e.target.value);

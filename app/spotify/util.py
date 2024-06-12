@@ -52,7 +52,6 @@ def refresh_token(session_id):
   access_token = response.get('access_token')
   token_type = response.get('token_type')
   expires_in = response.get('expires_in')
-  refresh_token = response.get('refresh_token')
 
   update_or_create_user_token(
       session_id, access_token, token_type, expires_in, refresh_token)
@@ -73,3 +72,14 @@ def exe_api_request(session_id, endpoint, post_=False, put_=False):
   except:
     return {"Error": "Issue with request"}
 
+def pause_song(session_id):
+  return exe_api_request(session_id, "player/pause", put_=True)
+
+def play_song(session_id):
+  return exe_api_request(session_id, "player/play", put_=True)
+
+def skip_song(session_id):
+  return exe_api_request(session_id, "player/next", post_=True)
+
+def prev_song(session_id):
+  return exe_api_request(session_id, "player/previous", post_=True)

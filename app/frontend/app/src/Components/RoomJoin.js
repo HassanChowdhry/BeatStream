@@ -19,7 +19,6 @@ const RoomJoinPage = () => {
         code: roomCode,
       }),
     };
-    // const SERVER = "http://127.0.0.1:8000";
     fetch(`/api/join-room`, requestOptions)
       .then((response) => {
         if (response.ok) {
